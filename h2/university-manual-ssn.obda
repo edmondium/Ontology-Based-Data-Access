@@ -1,0 +1,125 @@
+[PrefixDeclaration]
+:		http://example.org/voc#
+ex:		http://example.org/
+owl:		http://www.w3.org/2002/07/owl#
+rdf:		http://www.w3.org/1999/02/22-rdf-syntax-ns#
+xml:		http://www.w3.org/XML/1998/namespace
+xsd:		http://www.w3.org/2001/XMLSchema#
+foaf:		http://xmlns.com/foaf/0.1/
+obda:		https://w3id.org/obda/vocabulary#
+rdfs:		http://www.w3.org/2000/01/rdf-schema#
+
+[MappingDeclaration] @collection [[
+mappingId	uni1-student
+target		ex:uni1/student/{s_id} a :Student ; foaf:firstName {first_name}^^xsd:string ; foaf:lastName {last_name}^^xsd:string . ex:person/{ssn} a :Student ; foaf:firstName {first_name}^^xsd:string ; foaf:lastName {last_name}^^xsd:string . 
+source		SELECT * FROM "uni1"."student"
+
+mappingId	uni1-academic
+target		ex:uni1/academic/{a_id} a :FacultyMember ; foaf:firstName {first_name}^^xsd:string ; foaf:lastName {last_name}^^xsd:string . ex:person/{ssn} a :FacultyMember ; foaf:firstName {first_name}^^xsd:string ; foaf:lastName {last_name}^^xsd:string . 
+source		SELECT * FROM "uni1"."academic"
+
+mappingId	uni1-fullProfessor
+target		ex:uni1/academic/{a_id} a :FullProfessor . ex:person/{ssn} a :FullProfessor . 
+source		SELECT * FROM "uni1"."academic"
+			WHERE "position" = 1
+
+mappingId	uni1-AssociateProfessor
+target		ex:uni1/academic/{a_id} a :AssociateProfessor . 
+source		SELECT * FROM "uni1"."academic"
+			WHERE "position" = 2
+
+mappingId	uni1-PostDoc
+target		ex:uni1/academic/{a_id} a :PostDoc . 
+source		SELECT * FROM "uni1"."academic"
+			WHERE "position" = 9
+
+mappingId	uni1-externalTeacher
+target		ex:uni1/academic/{a_id} a :ExternalTeacher . 
+source		SELECT * FROM "uni1"."academic"
+			WHERE "position" = 8
+
+mappingId	uni1-teaching
+target		ex:person/{ssn} :teaches ex:uni1/course/{c_id} . 
+source		SELECT ac."ssn", te."c_id"
+			FROM "uni1"."teaching" te, "uni1"."academic" ac
+			WHERE te."a_id" = ac."a_id"
+
+mappingId	uni1-course
+target		ex:uni1/course/{c_id} a :Course ; :title {title} ; :isGivenAt ex:uni1/university . 
+source		SELECT * FROM "uni1"."course"
+
+mappingId	uni1-registration
+target		ex:person/{ssn} :attends ex:uni1/course/{c_id} . 
+source		SELECT st."ssn", re."c_id"
+			FROM "uni1"."course-registration" re, "uni1"."student" st
+			WHERE re."s_id" = st."s_id"
+
+mappingId	uni2-person
+target		ex:uni2/person/{pid} a foaf:Person ; foaf:firstName {fname}^^xsd:string ; foaf:lastName {lname}^^xsd:string . ex:person/{ssn} a foaf:Person ; foaf:firstName {fname}^^xsd:string ; foaf:lastName {lname}^^xsd:string . 
+source		SELECT * FROM "uni2"."person"
+
+mappingId	uni2-undergraduate
+target		ex:uni2/person/{pid} a :UndergraduateStudent . ex:person/{ssn} a :UndergraduateStudent . 
+source		SELECT * FROM "uni2"."person"
+			WHERE "status" = 1
+
+mappingId	uni2-graduate
+target		ex:uni2/person/{pid} a :GraduateStudent . 
+source		SELECT * FROM "uni2"."person"
+			WHERE "status" = 2
+
+mappingId	uni2-fullProfessor
+target		ex:uni2/person/{pid} a :FullProfessor . 
+source		SELECT * FROM "uni2"."person"
+			WHERE "status" = 7
+
+mappingId	uni2-associate-prof
+target		ex:uni2/person/{pid} a :AssociateProfessor . 
+source		SELECT * FROM "uni2"."person"
+			WHERE "status" = 8
+
+mappingId	uni2-course
+target		ex:uni2/course/{cid} a :Course ; :title {topic}^^xsd:string ; :isGivenAt ex:uni2/university . 
+source		SELECT * FROM "uni2"."course"
+
+mappingId	uni2-lecturer
+target		ex:person/{ssn} :givesLecture ex:uni2/course/{cid} . 
+source		SELECT pe."ssn", co."cid" 
+			FROM "uni2"."course" co, "uni2"."person" pe
+			WHERE co."lecturer" = pe."pid"
+
+mappingId	uni2-assistantProfessor
+target		ex:uni2/person/{pid} a :AssistantProfessor . 
+source		SELECT * FROM "uni2"."person"
+			WHERE "status" = 9
+
+mappingId	uni2-postDoc
+target		ex:uni2/person/{pid} a :PostDoc . 
+source		SELECT * FROM "uni2"."person"
+			WHERE "status" = 3
+
+mappingId	uni2-lab-teacher
+target		ex:person/{ssn} :givesLab ex:uni2/course/{cid} . 
+source		SELECT pe."ssn", co."cid"
+			FROM "uni2"."course" co, "uni2"."person" pe
+			WHERE co."lab_teacher" = pe."pid"
+
+mappingId	uni2-registration
+target		ex:person/{ssn} :attends ex:uni2/course/{cid} . 
+source		SELECT pe."ssn", re."cid"
+			FROM "uni2"."registration" re, "uni2"."person" pe
+			WHERE re."pid" = pe."pid"
+
+mappingId	uni1-academic-canonical
+target		:person/{ssn} obda:isCanonicalIRIOf :uni1/academic/{a_id} . 
+source		SELECT * FROM "uni1"."academic"
+
+mappingId	uni1.student-canonical
+target		:person/{ssn} obda:isCanonicalIRIOf :uni1/student/{s_id} . 
+source		SELECT * FROM "uni1"."student"
+
+mappingId	uni2.person-canonical
+target		:person/{ssn} obda:isCanonicalIRIOf :uni2/person/{pid} . 
+source		SELECT * FROM "uni2"."person"
+]]
+

@@ -1,0 +1,30 @@
+@prefix wdt: <https://query.wikidata.org/> .
+
+@source londonCon[2]: load-csv("london.csv") .
+
+@source parisCon[4] : sparql(wdt:sparql,"item,itemLabel,adjacent,adjacentLabel", 
+"""
+?item wdt:P31/wdt:P279* wd:Q928830 ; 
+wdt:P81 wd:Q13224 . 
+?item p:P197 [ ps:P197 ?adjacent ; pq:P5051 wd:Q585752; pq:P81 wd:Q13224] . 
+SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\" . }
+"""
+) .
+
+% trip(?X,?Y) :- londonCon(?X,?Y) .
+% trip(?X,?Z) :- londonCon(?X,?Y), trip(?Y,?Z) .
+
+% tripWithStop(?X,?Y,?Z) :- trip(?X,?Y), trip(?Y,?Z) .
+
+stationName(?X,?Y) :- parisCon(?X,?Y,?Z,?W) .
+stationName(?X,?Y) :- parisCon(?Z,?W,?X,?Y) .
+parisConNoLabels(?X,?Y) :- parisCon(?X,?Z,?Y,?W) .
+
+trip(?X,?Y) :- parisConNoLabels(?X,?Y) .
+trip(?X,?Z) :- parisConNoLabels(?X,?Y), trip(?Y,?Z) .
+
+tripWithLabels(?XLabel,?YLabel) :- trip(?X,?Y), stationName(?X, ?XLabel), stationName(?Y,?YLabel) .
+
+
+
+

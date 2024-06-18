@@ -1,0 +1,34 @@
+@source uni1_academic[4] : load-csv("data/uni1_academic.csv").
+@source uni1_course[2] : load-csv("data/uni1_course.csv").
+@source uni1_course_registration[2] : load-csv("data/uni1_course_registration.csv").
+@source uni1_student[3] : load-csv("data/uni1_student.csv").
+@source uni2_course[4] : load-csv("data/uni2_course.csv").
+@source uni2_person[4] : load-csv("data/uni2_person.csv").
+FacultyMember(?ID) :- uni1_academic(?ID, ?FirstName, ?LastName, ?Position).
+Researcher(?X) :- PhDStudent(?X) .
+Teacher(?X) :- ExternalTeacher(?X) .
+Professor(?X) :- FullProfessor(?X) .
+GraduateStudent(?X) :- PhDStudent(?X) .
+Teacher(?X) :- Professor(?X) .
+Course(?Y1) :- attends(?X, ?Y1) .
+Person(?X) :- FacultyMember(?X) .
+teaches(?Y1, ?X) :- isTaughtBy(?X, ?Y1) .
+isTaughtBy(?X, ?Y1) :- teaches(?Y1, ?X) .
+Researcher(?X) :- Professor(?X) .
+teaches(?X, ?Y1) :- givesLecture(?X, ?Y1) .
+Course(?X) :- isGivenAt(?X, ?Y1) .
+Professor(?X) :- AssistantProfessor(?X) .
+EducationalInstitution(?Y1) :- isGivenAt(?X, ?Y1) .
+Student(?X) :- GraduateStudent(?X) .
+FacultyMember(?X) :- Teacher(?X) .
+Person(?X) :- attends(?X, ?Y1) .
+isSupervisedBy(?X, !Y1), Professor(!Y1) :- GraduateStudent(?X) .
+teaches(?X, ?Y1) :- givesLab(?X, ?Y1) .
+Teacher(?X) :- teaches(?X, ?Y1) .
+FacultyMember(?X) :- Researcher(?X) .
+Professor(?X) :- AssociateProfessor(?X) .
+Student(?X) :- UndergraduateStudent(?X) .
+Researcher(?X) :- PostDoc(?X) .
+Person(?X) :- Student(?X) .
+Course(?Y1) :- teaches(?X, ?Y1) .
+ 
